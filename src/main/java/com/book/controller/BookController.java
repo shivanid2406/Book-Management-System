@@ -4,10 +4,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -29,7 +34,7 @@ public class BookController {
 
 		List<Book> book = repo.findAll();
 		model.addAttribute("book", book);
-		return "list-books";
+		return findPageAndSort(0, "id", "asc", model);
 	}
 
 	@GetMapping("/addBook")
@@ -55,12 +60,34 @@ public class BookController {
 		model.addAttribute("book", theBook);
 		return "book-form";
 	}
-	
+
 	@GetMapping("/deleteBook")
 	public String deleteBook(@RequestParam("id") int id) {
-		
+
 		repo.deleteById(id);
 		return "redirect:/list";
+	}
+
+	@GetMapping("/page/{pageNo}")
+	public String findPageAndSort(@PathVariable(value = "pageNo") int pageNo,
+			@RequestParam("sortField") String sortField, @RequestParam("sortDir") String sortDir, Model model) {
+
+		Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortField).ascending()
+				: Sort.by(sortField).descending();
+
+		Pageable pageable = PageRequest.of(pageNo, 3, sort);
+		Page<Book> page = repo.findAll(pageable);
+		List<Book> list = page.getContent();
+
+		model.addAttribute("pageNo", pageNo);
+		model.addAttribute("totalElements", page.getTotalElements());
+		model.addAttribute("totalPage", page.getTotalPages());
+		model.addAttribute("allBooks", list);
+		model.addAttribute("sortField", sortField);
+		model.addAttribute("sortDir", sortDir);
+		model.addAttribute("revSortDir", sortDir.equals("asc") ? "desc" : "asc");
+		return "list-books";
+
 	}
 
 }
