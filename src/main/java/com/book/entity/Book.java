@@ -1,3 +1,4 @@
+
 package com.book.entity;
 
 import jakarta.persistence.Column;
@@ -21,17 +22,21 @@ public class Book {
 
 	@Column(name = "price")
 	private String price;
-
-	public Book(int id, String name, String price) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.price = price;
-	}
+	
+	@Column(name = "quantity")
+	private String quantity;
 
 	public Book() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+
+	public Book(int id, String name, String price, String quantity) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.price = price;
+		this.quantity = quantity;
 	}
 
 	public int getId() {
@@ -58,8 +63,18 @@ public class Book {
 		this.price = price;
 	}
 
+	public String getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(String quantity) {
+		this.quantity = quantity;
+	}
+
 	@Override
 	public String toString() {
-		return "Book [id=" + id + ", name=" + name + ", price=" + price + "]";
+		return "Book [id=" + id + ", name=" + name + ", price=" + price + ", quantity=" + quantity + "]";
 	}
+
+	
 }
